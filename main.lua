@@ -65,6 +65,14 @@ buttons.circ_button = Button(52, 10, nil, function (self)
   end)
 buttons.circ_button.state = "circle"
 
+buttons.remove_button = Button(94, 10, nil, function (self)
+    love.graphics.setColor(216, 178, 33)
+    love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+    love.graphics.setColor(201, 33, 33)
+    love.graphics.print("X", self.x + 5, self.y + 5)
+  end)
+buttons.remove_button.state = "remove"
+
 function love.load()
   love.physics.setMeter(METER)
   world = love.physics.newWorld(grav_x, grav_y, true)
@@ -99,17 +107,6 @@ function love.load()
   objects.ball.shape = love.physics.newRectangleShape(20, 20) --the ball's shape has a radius of 20
   objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1) -- Attach fixture to body and give it a density of 1.
   objects.ball.fixture:setRestitution(0.9) --let the ball bounce
-
-  --let's create a couple blocks to play around with
-  objects.block1 = {}
-  objects.block1.body = love.physics.newBody(world, 200, 550, "dynamic")
-  objects.block1.shape = love.physics.newRectangleShape(0, 0, 50, 100)
-  objects.block1.fixture = love.physics.newFixture(objects.block1.body, objects.block1.shape, 5) -- A higher density gives it more mass.
-
-  objects.block2 = {}
-  objects.block2.body = love.physics.newBody(world, 200, 400, "dynamic")
-  objects.block2.shape = love.physics.newRectangleShape(0, 0, 100, 50)
-  objects.block2.fixture = love.physics.newFixture(objects.block2.body, objects.block2.shape, 2)
 
   --initial graphics setup
   love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue
@@ -174,11 +171,17 @@ function love.mousepressed(x, y, button)
       end
     end
 
-    if not buttonclick and state.shape then
+    if not buttonclick and state.shape and state.shape ~= "remove" then
       state.color = {love.math.random(255), love.math.random(255), love.math.random(255)}
       state.drawing = true
       print("drawing!")
       state.origin.x, state.origin.y = x, y
+    end
+
+    if state.shape == "remove" then
+      love.mouse.setCursor(love.mouse.getSystemCursor("no"))
+    else
+      love.mouse.setCursor(love.mouse.getSystemCursor("arrow"))
     end
   elseif button == 'r' then
     if state.body_type == "static" then
@@ -205,6 +208,14 @@ function love.mousereleased()
     end
     new_object.fixture = love.physics.newFixture(new_object.body, new_object.shape)
     table.insert(objects, new_object)
+  elseif state.shape == "remove" then
+    for k,v in pairs(objects) do
+      print(k, v.fixture:testPoint(love.mouse.getPosition()))
+      if v.fixture:testPoint(love.mouse.getPosition()) then
+        v.fixture:destroy()
+        objects[k] = nil
+      end
+    end
   end
 end
 
@@ -235,15 +246,13 @@ function love.draw()
   --love.graphics.circle("fill", objects.ball.body:getX(), objects.ball.body:getY(), objects.ball.shape:getRadius())
   love.graphics.polygon("fill", objects.ball.body:getWorldPoints(objects.ball.shape:getPoints())) -- draw a "filled in" polygon using the ground's coordinates
   love.graphics.setColor(50, 50, 50) -- set the drawing color to grey for the blocks
-  love.graphics.polygon("fill", objects.block1.body:getWorldPoints(objects.block1.shape:getPoints()))
-  love.graphics.polygon("fill", objects.block2.body:getWorldPoints(objects.block2.shape:getPoints()))
 
   love.graphics.print("force: " .. force, WINDOW_X - 100, 20)
   love.graphics.print("grav_x: " .. grav_x, WINDOW_X - 100, 40)
   love.graphics.print("grav_y: " .. grav_y, WINDOW_X - 100, 60)
 
-  for i, v in ipairs(objects) do
-    love.graphics.setColor(unpack(v.color))
+  for i, v in pairs(objects) do
+    if v.color then love.graphics.setColor(unpack(v.color)) end
     if v.type == "rect" then
       love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
     elseif v.type == "circle" then
