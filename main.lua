@@ -1,6 +1,6 @@
 local METER = 64
-local WINDOW_X = 640
-local WINDOW_Y = 640
+local WINDOW_X = 600
+local WINDOW_Y = 600
 
 local force = 100
 local grav_x = 0
@@ -73,29 +73,29 @@ function love.load()
 
   --let's create the ground
   objects.ground = {}
-  objects.ground.body = love.physics.newBody(world, 640/2, 640-50/2) --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
-  objects.ground.shape = love.physics.newRectangleShape(640, 50) --make a rectangle with a width of 650 and a height of 50
+  objects.ground.body = love.physics.newBody(world, WINDOW_X/2, WINDOW_Y-50/2) --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+  objects.ground.shape = love.physics.newRectangleShape(WINDOW_X, 50) --make a rectangle with a width of 650 and a height of 50
   objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape); --attach shape to body
   objects.ground.fixture:setRestitution(0.5)
   objects.wall_left = {}
-  objects.wall_left.body = love.physics.newBody(world, 0, 640/2)
-  objects.wall_left.shape = love.physics.newRectangleShape(0, 640)
+  objects.wall_left.body = love.physics.newBody(world, 0, WINDOW_Y/2)
+  objects.wall_left.shape = love.physics.newRectangleShape(0, WINDOW_Y)
   objects.wall_left.fixture = love.physics.newFixture(objects.wall_left.body, objects.wall_left.shape);
   objects.wall_left.fixture:setRestitution(1)
   objects.wall_right = {}
-  objects.wall_right.body = love.physics.newBody(world, 640, 640/2)
-  objects.wall_right.shape = love.physics.newRectangleShape(0, 640)
+  objects.wall_right.body = love.physics.newBody(world, WINDOW_X, WINDOW_Y/2)
+  objects.wall_right.shape = love.physics.newRectangleShape(0, WINDOW_Y)
   objects.wall_right.fixture = love.physics.newFixture(objects.wall_right.body, objects.wall_right.shape);
   objects.wall_right.fixture:setRestitution(1)
   objects.ceiling = {}
-  objects.ceiling.body = love.physics.newBody(world, 640/2, 0)
-  objects.ceiling.shape = love.physics.newRectangleShape(640, 0)
+  objects.ceiling.body = love.physics.newBody(world, WINDOW_X/2, 0)
+  objects.ceiling.shape = love.physics.newRectangleShape(WINDOW_X, 0)
   objects.ceiling.fixture = love.physics.newFixture(objects.ceiling.body, objects.ceiling.shape);
   objects.ceiling.fixture:setRestitution(1)
 
   --let's create a ball
   objects.ball = {}
-  objects.ball.body = love.physics.newBody(world, 640/2, 640/2, "dynamic") --place the body in the center of the world and make it dynamic, so it can move around
+  objects.ball.body = love.physics.newBody(world, WINDOW_X/2, WINDOW_Y/2, "dynamic") --place the body in the center of the world and make it dynamic, so it can move around
   objects.ball.shape = love.physics.newRectangleShape(20, 20) --the ball's shape has a radius of 20
   objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1) -- Attach fixture to body and give it a density of 1.
   objects.ball.fixture:setRestitution(0.9) --let the ball bounce
